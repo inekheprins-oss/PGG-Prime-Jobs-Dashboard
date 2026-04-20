@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGG Prime Jobs Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --accent: #1f6feb;
+    --accent2: #388bfd;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --orange: #f0883e;
+    --red: #f85149;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .header-brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .brand-logo {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 16px; color: #fff;
+  }
+  .brand-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 22px; letter-spacing: 0.5px;
+    color: var(--text);
+  }
+  .brand-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* DATE CARD */
+  .date-card {
+    background: linear-gradient(135deg, #1a2744 0%, #1f3460 100%);
+    border: 1px solid #2a4080;
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .date-icon { font-size: 22px; }
+  .date-main {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 17px; color: #fff;
+  }
+  .date-sub { font-size: 11px; color: #7aa3e0; margin-top: 2px; }
+  .date-badge {
+    background: #1f6feb;
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 13px;
+    padding: 4px 10px; border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* MAIN LAYOUT */
+  .main { display: flex; height: calc(100vh - 65px); overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 260px; min-width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .search-wrap { position: relative; }
+  .search-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 8px 12px 8px 34px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+  .search-icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: 14px;
+    pointer-events: none;
+  }
+  .selected-badge {
+    margin-top: 8px;
+    background: rgba(31,111,235,0.15);
+    border: 1px solid rgba(31,111,235,0.4);
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px; color: var(--accent2);
+    display: none;
+    align-items: center; gap: 6px;
+  }
+  .selected-badge.visible { display: flex; }
+  .selected-badge .clear-btn {
+    margin-left: auto; cursor: pointer;
+    color: var(--muted); font-size: 14px;
+    background: none; border: none; color: var(--accent2);
+  }
+  .sidebar-list { overflow-y: auto; flex: 1; }
+  .region-group {}
+  .region-label {
+    padding: 10px 16px 4px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+  .centre-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: background 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .centre-item:hover { background: rgba(255,255,255,0.04); }
+  .centre-item.active {
+    background: rgba(31,111,235,0.12);
+    border-left-color: var(--accent);
+  }
+  .centre-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .centre-name { font-size: 12.5px; color: var(--text); line-height: 1.3; }
+  .centre-pct { margin-left: auto; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+
+  /* CONTENT */
+  .content { flex: 1; overflow-y: auto; padding: 18px; }
+
+  /* KPI ROW */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .kpi-label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 32px;
+    line-height: 1;
+  }
+  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .kpi-change {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 6px; border-radius: 3px;
+    display: inline-block; margin-top: 4px;
+  }
+  .change-good { background: rgba(63,185,80,0.15); color: var(--green); }
+  .change-bad { background: rgba(248,81,73,0.15); color: var(--red); }
+
+  /* GAUGE SECTION */
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 15px;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .gauge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .gauge-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.1s;
+  }
+  .gauge-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .gauge-card.active { border-color: var(--accent); background: rgba(31,111,235,0.06); }
+  .gc-name { font-size: 11.5px; font-weight: 600; color: var(--text); margin-bottom: 10px; line-height: 1.3; }
+  .gc-gauge { position: relative; width: 100%; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .gc-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+  .gc-vals {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 11px; color: var(--muted);
+  }
+  .gc-pct { font-weight: 700; font-size: 13px; }
+
+  /* ARC GAUGE */
+  .arc-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .arc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .arc-title { font-size: 12px; color: var(--muted); margin-bottom: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .arc-wrap { position: relative; width: 160px; height: 90px; overflow: hidden; }
+  .arc-svg { width: 160px; height: 160px; position: absolute; top: 0; left: 0; }
+  .arc-center {
+    position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+    text-align: center;
+  }
+  .arc-val { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; }
+  .arc-of { font-size: 10px; color: var(--muted); }
+  .arc-labels { display: flex; justify-content: space-between; width: 160px; margin-top: 4px; font-size: 10px; color: var(--muted); }
+
+  /* DATA GRID */
+  .data-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .data-table-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .data-table-title { font-weight: 700; font-size: 14px; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    background: var(--surface2);
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .data-table th:not(:first-child) { text-align: right; }
+  .data-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    font-size: 12.5px;
+  }
+  .data-table td:not(:first-child) { text-align: right; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tbody tr { transition: background 0.1s; cursor: pointer; }
+  .data-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+  .data-table tbody tr.active { background: rgba(31,111,235,0.1); }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+  }
+  .pill-green { background: rgba(63,185,80,0.15); color: var(--green); }
+  .pill-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .pill-orange { background: rgba(240,136,62,0.15); color: var(--orange); }
+  .pill-red { background: rgba(248,81,73,0.15); color: var(--red); }
+  .progress-cell { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+  .mini-bar { width: 60px; height: 5px; background: var(--bg); border-radius: 2px; overflow: hidden; flex-shrink: 0; }
+  .mini-fill { height: 100%; border-radius: 2px; }
+
+  /* SCROLLBARS */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* HIDDEN items for search */
+  .centre-item.hidden, .data-table tbody tr.hidden { display: none; }
+  .region-group.hidden { display: none; }
+
+  /* TOOLTIP */
+  .tooltip {
+    position: fixed; pointer-events: none;
+    background: #000; border: 1px solid var(--border);
+    border-radius: 4px; padding: 6px 10px;
+    font-size: 11px; z-index: 1000;
+    display: none; white-space: nowrap;
+  }
+
+  @media (max-width: 900px) {
+    .arc-section { grid-template-columns: 1fr; }
+    .main { flex-direction: column; height: auto; }
+    .sidebar { width: 100%; min-width: unset; height: 300px; }
+  }
+
+  /* LOAD EXCEL BUTTON */
+  .load-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #238636, #2ea043);
+    border: 1px solid #3fb950;
+    border-radius: 6px;
+    color: #fff;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 600; font-size: 13px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .load-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .load-btn:active { transform: translateY(0); }
+  #fileInput { display: none; }
+  .load-status {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .load-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  .load-status.loaded .dot { background: var(--green); }
+  .load-status.error .dot { background: var(--red); }
+  .load-status.loaded { color: var(--green); }
+  .load-status.error { color: var(--red); }
+  .loading-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(13,17,23,0.7); z-index: 500;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+  }
+  .loading-overlay.visible { display: flex; }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: var(--text); font-size: 14px; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <div class="brand-logo">PGG</div>
+    <div>
+      <div class="brand-title">Prime Jobs Dashboard</div>
+      <div class="brand-sub">Monthly Target Tracking · April 2026</div>
+    </div>
+  </div>
+
+  <div class="date-card">
+    <div class="date-icon">📅</div>
+    <div>
+      <div class="date-main" id="dateMain">Monday, 20 April 2026</div>
+      <div class="date-sub">Trading Day <strong id="tradingDay">—</strong> of April</div>
+    </div>
+    <div class="date-badge" id="daysLeftBadge">— days left</div>
+  </div>
+  <div style="font-size:11px;color:var(--muted);text-align:right" id="lastRefreshed">Loading data…</div>
+  <div style="display:none">
+  </div>
+
+</div>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Reading Excel file…</div>
+</div>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Fitment Centres</div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="searchInput" type="text" placeholder="Search centres…" autocomplete="off">
+      </div>
+      <div class="selected-badge" id="selectedBadge">
+        <span id="selectedText">All Centres</span>
+        <button class="clear-btn" onclick="clearSelection()">✕</button>
+      </div>
+    </div>
+    <div class="sidebar-list" id="sidebarList"></div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="content">
+    <!-- KPI ROW -->
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <!-- ARC GAUGES -->
+    <div class="section-title">Monthly Target Progress</div>
+    <div class="arc-section" id="arcSection"></div>
+
+    <!-- GAUGE GRID -->
+    <div class="section-title">Daily Target Gauges — All Centres</div>
+    <div class="gauge-grid" id="gaugeGrid"></div>
+
+    <!-- DATA GRID -->
+    <div class="section-title">Prime Jobs Detail</div>
+    <div class="data-table-wrap">
+      <div class="data-table-header">
+        <div class="data-table-title">Fitment Centre Breakdown</div>
+        <div style="font-size:11px;color:var(--muted)" id="tableCount"></div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table" id="dataTable">
+          <thead>
+            <tr>
+              <th>Fitment Centre</th>
+              <th>Region</th>
+              <th>Target MTD</th>
+              <th>Completed</th>
+              <th>Invoiced</th>
+              <th>Progress</th>
+              <th>Gap</th>
+              <th>Daily Target</th>
+              <th>Film Done</th>
+              <th>ADAS Done</th>
+              <th>Other Done</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// Data loaded from data.json
+let CENTRES = [];
+const TODAY_INFO = {
+  date: new Date(),
+  monthDaysLeft: 0,
+  tradingDayOfMonth: 0,
+  totalTradingDaysInMonth: 0
+};
+
+
+// ===================== HELPERS =====================
+function getPct(c) {
+  return c.primeTarget > 0 ? Math.round(c.primeCompletedMTD / c.primeTarget * 100) : 0;
+}
+function getColor(pct) {
+  if (pct >= 80) return '#3fb950';
+  if (pct >= 60) return '#d29922';
+  if (pct >= 40) return '#f0883e';
+  return '#f85149';
+}
+function getPillClass(pct) {
+  if (pct >= 80) return 'pill-green';
+  if (pct >= 60) return 'pill-yellow';
+  if (pct >= 40) return 'pill-orange';
+  return 'pill-red';
+}
+function getStatusLabel(pct) {
+  if (pct >= 80) return 'On Track';
+  if (pct >= 60) return 'At Risk';
+  if (pct >= 40) return 'Behind';
+  return 'Critical';
+}
+function fmt(n) { return n.toLocaleString(); }
+
+// ===================== STATE =====================
+let selectedPlant = null;
+let searchTerm = '';
+
+// ===================== DATE CARD =====================
+function initDateCard() {
+  const d = TODAY_INFO.date;
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('dateMain').textContent = `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('tradingDay').textContent = TODAY_INFO.tradingDayOfMonth;
+  document.getElementById('daysLeftBadge').textContent = `${TODAY_INFO.monthDaysLeft} trading days left`;
+}
+
+// ===================== SIDEBAR =====================
+function buildSidebar() {
+  const regions = [...new Set(CENTRES.map(c => c.region))];
+  const list = document.getElementById('sidebarList');
+  list.innerHTML = '';
+  regions.forEach(region => {
+    const centres = CENTRES.filter(c => c.region === region);
+    const group = document.createElement('div');
+    group.className = 'region-group';
+    group.dataset.region = region;
+    const label = document.createElement('div');
+    label.className = 'region-label';
+    label.textContent = region;
+    group.appendChild(label);
+    centres.forEach(c => {
+      const pct = getPct(c);
+      const item = document.createElement('div');
+      item.className = 'centre-item';
+      item.dataset.plant = c.plant;
+      item.dataset.name = c.name.toLowerCase();
+      item.innerHTML = `
+        <div class="centre-dot" style="background:${getColor(pct)}"></div>
+        <div class="centre-name">${c.name}</div>
+        <div class="centre-pct" style="color:${getColor(pct)}">${pct}%</div>
+      `;
+      item.addEventListener('click', () => selectCentre(c.plant));
+      group.appendChild(item);
+    });
+    list.appendChild(group);
+  });
+}
+
+function selectCentre(plant) {
+  selectedPlant = plant === selectedPlant ? null : plant;
+  updateAll();
+}
+
+function clearSelection() {
+  selectedPlant = null;
+  searchTerm = '';
+  document.getElementById('searchInput').value = '';
+  updateAll();
+}
+
+// ===================== SEARCH =====================
+document.getElementById('searchInput').addEventListener('input', function() {
+  searchTerm = this.value.toLowerCase().trim();
+  updateAll();
+});
+
+// ===================== UPDATE SIDEBAR =====================
+function updateSidebar() {
+  const items = document.querySelectorAll('.centre-item');
+  const groups = document.querySelectorAll('.region-group');
+
+  items.forEach(item => {
+    const match = !searchTerm || item.dataset.name.includes(searchTerm);
+    const isSelected = selectedPlant && item.dataset.plant == selectedPlant;
+    item.classList.toggle('hidden', !match);
+    item.classList.toggle('active', isSelected);
+  });
+
+  groups.forEach(group => {
+    const visible = [...group.querySelectorAll('.centre-item:not(.hidden)')].length > 0;
+    group.classList.toggle('hidden', !visible);
+  });
+
+  const badge = document.getElementById('selectedBadge');
+  const selectedText = document.getElementById('selectedText');
+  if (selectedPlant) {
+    const c = CENTRES.find(x => x.plant === selectedPlant);
+    selectedText.textContent = c ? c.name : 'Selected';
+    badge.classList.add('visible');
+  } else if (searchTerm) {
+    const count = [...document.querySelectorAll('.centre-item:not(.hidden)')].length;
+    selectedText.textContent = `${count} matching`;
+    badge.classList.add('visible');
+  } else {
+    badge.classList.remove('visible');
+  }
+}
+
+// ===================== FILTER DATA =====================
+function getFilteredCentres() {
+  let data = CENTRES;
+  if (selectedPlant) {
+    data = data.filter(c => c.plant === selectedPlant);
+  } else if (searchTerm) {
+    data = data.filter(c => c.name.toLowerCase().includes(searchTerm));
+  }
+  return data;
+}
+
+// ===================== KPI =====================
+function buildKPIs(data) {
+  const totalTarget = data.reduce((s, c) => s + c.primeTarget, 0);
+  const totalCompleted = data.reduce((s, c) => s + c.primeCompletedMTD, 0);
+  const totalInvoiced = data.reduce((s, c) => s + c.primeInvoicedMTD, 0);
+  const totalFilm = data.reduce((s, c) => s + c.filmCompletedMTD, 0);
+  const totalAdas = data.reduce((s, c) => s + c.adasCompletedMTD, 0);
+  const totalOther = data.reduce((s, c) => s + c.otherCompletedMTD, 0);
+  const totalGap = data.reduce((s, c) => s + c.gap, 0);
+  const overallPct = totalTarget > 0 ? Math.round(totalCompleted / totalTarget * 100) : 0;
+
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">Total Target MTD</div>
+      <div class="kpi-value" style="color:var(--accent2)">${fmt(totalTarget)}</div>
+      <div class="kpi-sub">${data.length} fitment centre${data.length !== 1 ? 's' : ''}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Prime Completed</div>
+      <div class="kpi-value" style="color:${getColor(overallPct)}">${fmt(totalCompleted)}</div>
+      <div class="kpi-change ${overallPct >= 60 ? 'change-good' : 'change-bad'}">${overallPct}% of target</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Prime Invoiced</div>
+      <div class="kpi-value" style="color:var(--text)">${fmt(totalInvoiced)}</div>
+      <div class="kpi-sub">${totalTarget > 0 ? Math.round(totalInvoiced/totalTarget*100) : 0}% invoiced</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Remaining Gap</div>
+      <div class="kpi-value" style="color:var(--orange)">${fmt(totalGap)}</div>
+      <div class="kpi-sub">jobs still needed</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Film Jobs</div>
+      <div class="kpi-value" style="color:#58a6ff">${fmt(totalFilm)}</div>
+      <div class="kpi-sub">completed MTD</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">ADAS Jobs</div>
+      <div class="kpi-value" style="color:#bc8cff">${fmt(totalAdas)}</div>
+      <div class="kpi-sub">completed MTD</div>
+    </div>
+  `;
+}
+
+// ===================== ARC GAUGES =====================
+function drawArc(svgId, pct, color, completed, target) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const r = 70, cx = 80, cy = 80;
+  const startAngle = 180, endAngle = 0;
+  const angle = startAngle + (pct / 100) * 180;
+  const toRad = a => a * Math.PI / 180;
+  const x1 = cx + r * Math.cos(toRad(startAngle));
+  const y1 = cy + r * Math.sin(toRad(startAngle));
+  const x2 = cx + r * Math.cos(toRad(endAngle));
+  const y2 = cy + r * Math.sin(toRad(endAngle));
+  const fx = cx + r * Math.cos(toRad(angle));
+  const fy = cy + r * Math.sin(toRad(angle));
+  const la = pct > 50 ? 1 : 0;
+
+  svg.innerHTML = `
+    <path d="M ${x1} ${y1} A ${r} ${r} 0 1 1 ${x2} ${y2}" fill="none" stroke="#1c2333" stroke-width="14" stroke-linecap="round"/>
+    <path d="M ${x1} ${y1} A ${r} ${r} 0 ${la} 1 ${fx} ${fy}" fill="none" stroke="${color}" stroke-width="14" stroke-linecap="round"/>
+    <text x="${cx}" y="${cy+8}" text-anchor="middle" fill="${color}" font-family="Barlow Condensed,sans-serif" font-weight="800" font-size="24">${pct}%</text>
+    <text x="${cx}" y="${cy+26}" text-anchor="middle" fill="#8b949e" font-family="Barlow,sans-serif" font-size="11">${fmt(completed)} / ${fmt(target)}</text>
+  `;
+}
+
+function buildArcs(data) {
+  const totalTarget = data.reduce((s, c) => s + c.primeTarget, 0);
+  const totalInvoiced = data.reduce((s, c) => s + c.primeInvoicedMTD, 0);
+  const pctInv = totalTarget > 0 ? Math.round(totalInvoiced / totalTarget * 100) : 0;
+
+  // Daily Target = Col G (dailyTarget) — the target jobs for today
+  // Daily Gap remaining = Col P (dailyPrimeGap) minus Col R (primeInvoicedToday)
+  // As invoicing happens during the day, remainingGap shrinks toward 0
+  const totalDailyTarget = data.reduce((s, c) => s + Math.max(c.dailyTarget, 0), 0);
+  const totalDailyGap    = data.reduce((s, c) => s + Math.max(c.dailyPrimeGap, 0), 0);
+  const totalInvoicedToday = data.reduce((s, c) => s + (c.primeInvoicedToday || 0), 0);
+  const remainingDailyGap = Math.max(totalDailyGap - totalInvoicedToday, 0);
+
+  // % filled = how much of today's target has been invoiced
+  // Gauge shows: daily target is the full arc, invoiced today fills it
+  const dailyPct = totalDailyTarget > 0
+    ? Math.min(Math.round(totalInvoicedToday / totalDailyTarget * 100), 100)
+    : 0;
+
+  document.getElementById('arcSection').innerHTML = `
+    <div class="arc-card">
+      <div class="arc-title">Daily Target vs Daily Gap (Today)</div>
+      <div class="arc-wrap">
+        <svg id="arc1" viewBox="0 0 160 160" class="arc-svg"></svg>
+      </div>
+      <div class="arc-labels"><span>0</span><span>${fmt(Math.round(totalDailyTarget/2))}</span><span>${fmt(Math.round(totalDailyTarget))}</span></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center;line-height:1.7">
+        Daily target: <strong style="color:var(--text)">${fmt(Math.round(totalDailyTarget))}</strong>
+        &nbsp;·&nbsp; Invoiced today: <strong style="color:var(--green)">${fmt(totalInvoicedToday)}</strong><br>
+        Remaining gap: <strong style="color:${remainingDailyGap > 0 ? 'var(--orange)' : 'var(--green)'}">${fmt(Math.round(remainingDailyGap))}</strong>
+      </div>
+    </div>
+    <div class="arc-card">
+      <div class="arc-title">Prime Invoiced vs Monthly Target</div>
+      <div class="arc-wrap">
+        <svg id="arc2" viewBox="0 0 160 160" class="arc-svg"></svg>
+      </div>
+      <div class="arc-labels"><span>0</span><span>${fmt(Math.round(totalTarget/2))}</span><span>${fmt(totalTarget)}</span></div>
+    </div>
+  `;
+  setTimeout(() => {
+    drawArc('arc1', dailyPct, getColor(dailyPct), totalInvoicedToday, Math.round(totalDailyTarget));
+    drawArc('arc2', Math.min(pctInv, 100), getColor(pctInv), totalInvoiced, totalTarget);
+  }, 50);
+}
+
+// ===================== GAUGE GRID =====================
+function buildGauges(data) {
+  const grid = document.getElementById('gaugeGrid');
+  grid.innerHTML = data.map(c => {
+    const pct = getPct(c);
+    const color = getColor(pct);
+    return `
+      <div class="gauge-card ${selectedPlant === c.plant ? 'active' : ''}" onclick="selectCentre(${c.plant})">
+        <div class="gc-name">${c.name}</div>
+        <div class="gc-gauge">
+          <div class="gc-fill" style="width:${Math.min(pct,100)}%;background:${color}"></div>
+        </div>
+        <div class="gc-vals">
+          <span>${fmt(c.primeCompletedMTD)} / ${fmt(c.primeTarget)}</span>
+          <span class="gc-pct" style="color:${color}">${pct}%</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===================== TABLE =====================
+function buildTable(data) {
+  document.getElementById('tableCount').textContent = `${data.length} centres shown`;
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = data.map(c => {
+    const pct = getPct(c);
+    const color = getColor(pct);
+    const pillClass = getPillClass(pct);
+    return `
+      <tr class="${selectedPlant === c.plant ? 'active' : ''}" onclick="selectCentre(${c.plant})">
+        <td><strong>${c.name}</strong><br><span style="color:var(--muted);font-size:11px">${c.regional}</span></td>
+        <td><span style="color:var(--muted);font-size:11px">${c.region}</span></td>
+        <td>${fmt(c.primeTarget)}</td>
+        <td style="color:${color};font-weight:600">${fmt(c.primeCompletedMTD)}</td>
+        <td>${fmt(c.primeInvoicedMTD)}</td>
+        <td>
+          <div class="progress-cell">
+            <div class="mini-bar"><div class="mini-fill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div>
+            <span style="color:${color};font-weight:700;min-width:35px">${pct}%</span>
+          </div>
+        </td>
+        <td style="color:var(--orange)">${fmt(c.gap)}</td>
+        <td style="color:var(--muted)">${c.dailyTarget > 0 ? c.dailyTarget.toFixed(1) : '—'}</td>
+        <td>${fmt(c.filmCompletedMTD)}</td>
+        <td>${fmt(c.adasCompletedMTD)}</td>
+        <td>${fmt(c.otherCompletedMTD)}</td>
+        <td><span class="pill ${pillClass}">${getStatusLabel(pct)}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ===================== MASTER UPDATE =====================
+function updateAll() {
+  const data = getFilteredCentres();
+  updateSidebar();
+  buildKPIs(data);
+  buildArcs(data);
+  buildGauges(data);
+  buildTable(data);
+}
+
+// ===================== FETCH DATA FROM GITHUB =====================
+const DATA_URL = 'data.json';  // relative — works on GitHub Pages
+
+function loadData(showSpinner) {
+  if (showSpinner) {
+    document.getElementById('loadingOverlay').classList.add('visible');
+  }
+  // Cache-bust so GitHub always serves fresh file
+  fetch(DATA_URL + '?v=' + Date.now())
+    .then(r => {
+      if (!r.ok) throw new Error('Could not load data.json (HTTP ' + r.status + ')');
+      return r.json();
+    })
+    .then(json => {
+      // Update centres
+      CENTRES.length = 0;
+      json.centres.forEach(c => CENTRES.push(c));
+
+      // Update trading info
+      const ti = json.tradingInfo || {};
+      TODAY_INFO.date = new Date();
+      TODAY_INFO.monthDaysLeft       = ti.monthDaysLeft       || 0;
+      TODAY_INFO.tradingDayOfMonth   = ti.tradingDayOfMonth   || 0;
+      TODAY_INFO.totalTradingDaysInMonth = ti.totalTradingDaysInMonth || 0;
+
+      // Update last-refreshed stamp
+      const lastUpdated = json.lastUpdated ? new Date(json.lastUpdated) : new Date();
+      const timeStr = lastUpdated.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+      const dateStr = lastUpdated.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' });
+      document.getElementById('lastRefreshed').textContent =
+        'Data updated: ' + dateStr + ' ' + timeStr;
+
+      // Render everything
+      selectedPlant = null;
+      searchTerm = '';
+      initDateCard();
+      buildSidebar();
+      updateAll();
+    })
+    .catch(err => {
+      console.error('Data load failed:', err);
+      document.getElementById('lastRefreshed').textContent = '⚠ Could not load data: ' + err.message;
+      // Still render with whatever CENTRES we have (fallback to empty)
+      initDateCard();
+      buildSidebar();
+      updateAll();
+    })
+    .finally(() => {
+      document.getElementById('loadingOverlay').classList.remove('visible');
+    });
+}
+
+// ===================== INIT =====================
+loadData(true);
+
+// Auto-refresh every 5 minutes so open browser tabs stay current
+setInterval(() => loadData(false), 5 * 60 * 1000);
+
+</script>
+<!-- SheetJS for Excel reading -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>
